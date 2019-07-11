@@ -16,12 +16,23 @@ if(typeof(String.prototype.trim) === "undefined")
 }
 
 // split into different lines, i.e., samples
-var data = fs.readFileSync(filePath, 'utf8').split("\n");
+var data = fs.readFileSync(filePath, 'utf8').trim().split("\n");
 
 var processed = [];
+var group = [];
+var sentence = [];
 // skip header (first row):
+console.log(data.length)
 for (i = 1; i < data.length; i++) {
+  // process rows into something legible for groups and sentences
   processed.push(data[i].trim().split("\t"));
+  group.push(processed[processed.length - 1][3]);
+
+  sentence.push(processed[processed.length -1][4].split(" ").map(x => x.split("@")[0]));
+  // debug
+  // console.log(i);
+  // console.log(group[group.length -1]);
+  // console.log(processed[processed.length -1][4]);
 }
 
 var counter = 0;
@@ -30,9 +41,8 @@ function next(req, res) {
   counter++;
 
   if (counter < processed.length) {
-    // res.send(processed[counter-1][2])
-    console.log(processed[counter-1])
-    res.send(counter + "\n");
+    res.send(group[counter-1] + "\n" + sentence[counter-1] + "\n")
+    // res.send(counter + "\n");
   } else {
     res.status(404).send('Exceeded file lines!');
   }
