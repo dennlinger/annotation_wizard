@@ -1,0 +1,23 @@
+{
+  "name": "annotation_wizard",
+  "version": "1.0.0",
+  "description": "A simple tool that allows you to annotate tokens in a sentence via a visual Flask interface.",
+  "main": "backend.js",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dennlinger/annotation_wizard.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dennlinger/annotation_wizard/issues"
+  },
+  "homepage": "https://github.com/dennlinger/annotation_wizard#readme"
+}
