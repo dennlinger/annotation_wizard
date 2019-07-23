@@ -51,4 +51,4 @@ function next(req, res) {
 app.get('/next', (req, res) => {next(req, res)});
 
 // Listen
-app.listen(3000, () => console.log('Server ready'));
+app.listen(3001, () => console.log('Server ready'));

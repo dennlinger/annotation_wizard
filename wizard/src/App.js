@@ -31,23 +31,28 @@ class App extends Component {
     return body;
   }
 
+  onItemClick = function (event) {
+    event.currentTarget.style.backgroundColor = '#ccc';
+  }
+
+
   render() {
     console.log("Hello World");
     console.log(this.state.sentence);
     if (this.state.isLoaded) {
       var items = this.state.sentence.map((item) =>
-        <li>{item}</li>
+        <li onClick={this.onItemClick}>{item}</li>
       );
-    } else {
-      var items = []
     }
     return (
       <div className="App">
         <p className="group">{this.state.group}</p>
         <div className="sentence">
+          {this.state.sentence &&
           <ul>
-            {this.state.isLoaded ? items : <li>dummy</li>}
+            {items}
           </ul>
+          }
         </div>
       </div>
     );
