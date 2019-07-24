@@ -50,5 +50,7 @@ function next(req, res) {
 
 app.get('/next', (req, res) => {next(req, res)});
 
+app.post('/response', (req, res) => {console.log("Success!")})
+
 // Listen
 app.listen(3001, () => console.log('Server ready'));

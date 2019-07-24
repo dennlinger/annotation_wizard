@@ -18,10 +18,10 @@ class Paragraph extends Component {
       click: props.click
     };
   }
-  
+
   renderToken(val, ind) {
     return (
-      <Token text={val} click={() => this.state.click(ind)} />
+      <Token text={val} click={(event) => this.state.click(event, ind)} />
     )
   }
 
@@ -71,22 +71,43 @@ class App extends Component {
     return body;
   }
 
-  handleClick(i) {
+  handleClick(event, i) {
     const annotations = this.state.annotations.slice();
     annotations[i] = 1-annotations[i];
     this.setState({annotations: annotations});
-    console.log(i);
+    if (annotations[i] === 1) {
+      event.currentTarget.style.backgroundColor = '#000000';
+    } else {
+      event.currentTarget.style.backgroundColor = '#4CAF50';
+    }
     console.log(annotations.slice(0,20));
+  }
+
+  sendResponse() {
+    fetch('/response', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        annotations: this.state.annotations,
+      })
+    })
   }
 
   render() {
     return (
       <div className="App">
-        <p className="group">{this.state.group}</p>
-        <div className="sentence">
-          {this.state.sentence &&
-          <Paragraph tokens={this.state.sentence} click={this.handleClick} />
-          }
+        <div className="logo">Annotation Wizard</div>
+        <div className="wrapper">
+          <p className="group">{this.state.group}</p>
+          <div className="sentence">
+            {this.state.sentence &&
+            <Paragraph tokens={this.state.sentence} click={this.handleClick} />
+            }
+          </div>
+          <button className="next" onClick={() => this.sendResponse()}>Next sentence</button>
         </div>
       </div>
     );
