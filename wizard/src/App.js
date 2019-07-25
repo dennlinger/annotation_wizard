@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import update from 'immutability-helper';
 
 function Token(props) {
   return (
@@ -28,7 +27,7 @@ class Paragraph extends Component {
   render() {
     return (
       <ul>{this.state.tokens.map((val, ind) => {
-        return <li>{this.renderToken(val, ind)}</li>
+        return <li key={ind}>{this.renderToken(val, ind)}</li>
       })}</ul>
     );
   }
@@ -48,17 +47,20 @@ class App extends Component {
     };
   }
 
+
   componentDidMount() {
     this.callBackendAPI()
       .then(res => {
         this.setState({group: res.group,
                        sentence: res.sentence,
                        annotations: Array(res.sentence.length).fill(0),
-                       isLoaded: true});
+                       isLoaded: true,
+                     });
       })
       .catch(err => console.log(err));
 
   }
+
 
   callBackendAPI = async () => {
     const response = await fetch('/next');
@@ -70,6 +72,7 @@ class App extends Component {
 
     return body;
   }
+
 
   handleClick(event, i) {
     const annotations = this.state.annotations.slice();
@@ -83,8 +86,10 @@ class App extends Component {
     console.log(annotations.slice(0,20));
   }
 
-  sendResponse() {
-    fetch('/response', {
+
+  sendResponseAndUpdate() {
+    // send back the current sample
+    fetch('/receive', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -93,21 +98,35 @@ class App extends Component {
       body: JSON.stringify({
         annotations: this.state.annotations,
       })
-    })
+    });
+    this.setState({isLoaded: false})
+    // and then print new stuff after short delay
+    setTimeout(() => {
+    this.callBackendAPI()
+      .then(res => {
+        this.setState({group: res.group,
+                       sentence: res.sentence,
+                       annotations: Array(res.sentence.length).fill(0),
+                       isLoaded: true,
+                     });
+      })
+      .catch(err => console.log(err));
+    }, 500)
   }
+
 
   render() {
     return (
       <div className="App">
         <div className="logo">Annotation Wizard</div>
         <div className="wrapper">
-          <p className="group">{this.state.group}</p>
+          <p className="group">Current group phrase: "{this.state.group}"</p>
           <div className="sentence">
-            {this.state.sentence &&
+            {this.state.isLoaded &&
             <Paragraph tokens={this.state.sentence} click={this.handleClick} />
             }
           </div>
-          <button className="next" onClick={() => this.sendResponse()}>Next sentence</button>
+          <button className="next" onClick={() => this.sendResponseAndUpdate()}>Next sentence</button>
         </div>
       </div>
     );

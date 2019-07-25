@@ -4,7 +4,16 @@ const path = require('path');
 
 const app = express();
 
-let filePath = path.join(__dirname, 'input', 'test1.tsv');
+let inputFilePath = path.join(__dirname, 'input', 'test1.tsv');
+let outputFilePath = path.join(__dirname, 'output', 'test1.tsv');
+
+// based on https://stackoverflow.com/questions/51660428/elementwise-concatenation-of-string-arrays
+const merge = (a, b, del='@') => {return a.map((val, ind) => val + del + b[ind]);}
+
+// a = ['A', 'quick', 'test']
+// b = [0, 1, 0]
+//
+// console.log(merge(a,b))
 
 // https://stackoverflow.com/questions/1418050/string-strip-for-javascript
 if(typeof(String.prototype.trim) === "undefined")
@@ -15,14 +24,25 @@ if(typeof(String.prototype.trim) === "undefined")
     };
 }
 
-// split into different lines, i.e., samples
-let data = fs.readFileSync(filePath, 'utf8').trim().split("\n");
+// We can read synchronously, since we only do so at the start.
+// Split into different lines, i.e., samples.
+let data = fs.readFileSync(inputFilePath, 'utf8').trim().split("\n");
+
+// Output on the other hand should be processed by asynchronous stream,
+// since we do not quite know how often we access the file.
+// See https://stackoverflow.com/questions/3459476/how-to-append-to-a-file-in-node/43370201#43370201
+// for a good answer on the problem.
+let stream = fs.createWriteStream(outputFilePath, {flags:'a'});
+// TODO: Problematic is the fact that as of yet we don't really close the stream properly.
+// According to the post this is not a problem, but still not too nice.
 
 let processed = [];
 let group = [];
 let sentence = [];
+
 // skip header (first row):
-console.log(data.length)
+console.log(data.length + " elements in training file.")
+
 for (i = 1; i < data.length; i++) {
   // process rows into something legible for groups and sentences
   processed.push(data[i].trim().split("\t"));
@@ -38,19 +58,34 @@ for (i = 1; i < data.length; i++) {
 let counter = 0;
 
 function next(req, res) {
-  counter++;
-
-  if (counter < processed.length) {
-    res.json({group: group[counter-1],
-              sentence: sentence[counter-1]})
+  console.log("Received request with current index " + counter)
+  if (counter <= processed.length) {
+    res.json({group: group[counter],
+              sentence: sentence[counter]})
   } else {
     res.status(404).send('Exceeded file lines!');
   }
 }
 
+
+function receive(req, res) {
+  // Increase counter only if we receive values. That way we send the sample
+  // out until we get an annotation for it.
+  counter++;
+  console.log("Data returned and index now at " + counter)
+
+  // re-format the response into the input layout
+  let annotated_sentence = merge(sentence[counter -1], req.body.annotations).join(' ');
+  let processed_line = processed[counter -1];
+  processed_line[4] = annotated_sentence;
+  stream.write(processed_line.join('\t') + '\n');
+
+}
+
 app.get('/next', (req, res) => {next(req, res)});
 
-app.post('/response', (req, res) => {console.log("Success!")})
+app.use(express.json());
+app.post('/receive', (req, res) => {receive(req, res)})
 
 // Listen
 app.listen(3001, () => console.log('Server ready'));
