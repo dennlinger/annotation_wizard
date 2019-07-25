@@ -5,11 +5,17 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  background-color: rgb(138, 163, 177);
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+
+ul {
+  float: left;
 }
 
 
@@ -27,10 +33,11 @@ li {
 
 li:hover {
   background-color: lavender;
+  border-radius: 4px;
 }
 
 button {
-  background-color: #4CAF50; /* Green */
+  background-color: rgb(71, 92, 112);
   border: none;
   color: white;
   padding: 5px;
@@ -39,10 +46,16 @@ button {
   display: inline-block;
   font-size: 16px;
   min-width: 50px;
+  border-radius: 4px;
 }
 
 .group {
+  font-weight: 700;
+  color: rgb(7, 17, 31);
   font-size: 20px;
+  padding-top: 20px;
+  padding-left: 40px;
+  float: left;
 }
 
 .wrapper {
@@ -51,12 +64,35 @@ button {
 
 .logo {
   float: left;
+  margin-top: 5px;
+  margin-left: 10px;
   font-size: 24px;
+  font-weight: 800;
+  color: #00203a;
   break-after: avoid;
+  border-style: solid;
+  padding: 20px;
+  border-radius: 15px 35px 15px;
+  border-color: rgb(16, 133, 187);
 }
 
 .next {
-  background-color: #CCCCCC;
-  margin: 25px;
-  padding: 50px;
+  font-weight: 800;
+  font-size: 18px;
+  background-color: rgb(20, 37, 56);
+  float: right;
+  margin: 15px;
+  padding: 30px;
+}
+
+.next:hover {
+  -webkit-transition-duration: 0.3s; /* Safari */
+  transition-duration: 0.3s;
+  background-color: rgb(0, 32, 58);
+}
+
+.next:active {
+  -webkit-transition-duration: 0.1s; /* Safari */
+  transition-duration: 0.1s;
+  transform: translateY(4px);
 }

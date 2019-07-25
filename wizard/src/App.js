@@ -79,9 +79,9 @@ class App extends Component {
     annotations[i] = 1-annotations[i];
     this.setState({annotations: annotations});
     if (annotations[i] === 1) {
-      event.currentTarget.style.backgroundColor = '#000000';
+      event.currentTarget.style.backgroundColor = 'rgb(0, 32, 58)';
     } else {
-      event.currentTarget.style.backgroundColor = '#4CAF50';
+      event.currentTarget.style.backgroundColor = 'rgb(71, 92, 112)';
     }
     console.log(annotations.slice(0,20));
   }
@@ -125,7 +125,7 @@ class App extends Component {
       <div className="App">
         <div className="logo">Annotation Wizard</div>
         <div className="wrapper">
-          <p className="group">Current group phrase: "{this.state.group}"</p>
+          <p className="group">Group phrase: "{this.state.group}"</p>
           <div className="sentence">
             {this.state.isLoaded &&
             <Paragraph tokens={this.state.sentence} click={this.handleClick} />
