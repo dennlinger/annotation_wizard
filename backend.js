@@ -71,14 +71,15 @@ function next(req, res) {
 function receive(req, res) {
   // Increase counter only if we receive values. That way we send the sample
   // out until we get an annotation for it.
+  console.log("Data returned for index " + counter)
   counter++;
-  console.log("Data returned and index now at " + counter)
 
   // re-format the response into the input layout
   let annotated_sentence = merge(sentence[counter -1], req.body.annotations).join(' ');
   let processed_line = processed[counter -1];
   processed_line[4] = annotated_sentence;
   stream.write(processed_line.join('\t') + '\n');
+  res.status(200).send('Post successful!');
 
 }
 

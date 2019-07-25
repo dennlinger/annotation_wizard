@@ -89,6 +89,7 @@ class App extends Component {
 
   sendResponseAndUpdate() {
     // send back the current sample
+    console.log("Send results");
     fetch('/receive', {
       method: 'POST',
       headers: {
@@ -99,16 +100,20 @@ class App extends Component {
         annotations: this.state.annotations,
       })
     });
-    this.setState({isLoaded: false})
+    this.setState({isLoaded: false});
     // and then print new stuff after short delay
     setTimeout(() => {
+
+    console.log("Send request for new data");
     this.callBackendAPI()
       .then(res => {
+        console.log("New data received.")
         this.setState({group: res.group,
                        sentence: res.sentence,
                        annotations: Array(res.sentence.length).fill(0),
                        isLoaded: true,
                      });
+        console.log("Finished setting state.")
       })
       .catch(err => console.log(err));
     }, 500)
