@@ -66,9 +66,20 @@ for (i = 1; i < data.length; i++) {
 }
 
 let counter = config.counter;
+let annotated = config.annotated;
 
-function writeJSON(currentCount) {
+function writeSkipToConfig(currentCount) {
   config.counter = currentCount;
+  let newConfig = JSON.stringify(config);
+  fs.writeFile('secrets.json', newConfig, (err) => {
+    if (err) throw err;
+    console.log('The file has been saved!');
+  });
+}
+
+function writeCountToConfig(currentCount, currentAnnotated) {
+  config.counter = currentCount;
+  config.annotated = currentAnnotated;
   let newConfig = JSON.stringify(config);
   fs.writeFile('secrets.json', newConfig, (err) => {
     if (err) throw err;
@@ -80,7 +91,9 @@ function next(req, res) {
   console.log("Received request with current index " + counter)
   if (counter <= processed.length) {
     res.json({group: group[counter],
-              sentence: sentence[counter]})
+              sentence: sentence[counter],
+              numAnnotated: annotated,
+            })
   } else {
     res.status(404).send('Exceeded file lines!');
   }
@@ -92,7 +105,8 @@ function receive(req, res) {
   // out until we get an annotation for it.
   console.log("Data returned for index " + counter);
   counter++;
-  writeJSON(counter);
+  annotated++;
+  writeCountToConfig(counter, annotated);
 
   // re-format the response into the input layout
   let annotated_sentence = merge(sentence[counter -1], req.body.annotations).join(' ');
@@ -106,7 +120,7 @@ function receive(req, res) {
 function skip(req, res) {
   // Just increase the counter, in case a sentence should be skipped.
   counter ++;
-  writeJSON(counter);
+  writeSkipToConfig(counter);
   console.log('Sentence ' + counter + ' was skipped.');
   res.status(200).send('Successfully skipped!\n');
 }

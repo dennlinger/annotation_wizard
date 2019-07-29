@@ -44,6 +44,7 @@ class App extends Component {
       group: null,
       sentence: null,
       annotations: null,
+      numAnnotated: 0,
     };
   }
 
@@ -53,6 +54,7 @@ class App extends Component {
       .then(res => {
         this.setState({group: res.group,
                        sentence: res.sentence,
+                       numAnnotated: res.numAnnotated,
                        annotations: Array(res.sentence.length).fill(0),
                        isLoaded: true,
                      });
@@ -112,6 +114,7 @@ class App extends Component {
         console.log("New data received.")
         this.setState({group: res.group,
                        sentence: res.sentence,
+                       numAnnotated: res.numAnnotated,
                        annotations: Array(res.sentence.length).fill(0),
                        isLoaded: true,
                      });
@@ -146,6 +149,7 @@ class App extends Component {
         console.log("New data received.")
         this.setState({group: res.group,
                        sentence: res.sentence,
+                       numAnnotated: res.numAnnotated,
                        annotations: Array(res.sentence.length).fill(0),
                        isLoaded: true,
                      });
@@ -168,6 +172,7 @@ class App extends Component {
           </div>
           <button className="next" onClick={() => this.sendResponseAndUpdate()}>Next sentence</button>
           <button className="skip" onClick={() => this.sendSkipAndUpdate()}>Skip</button>
+          <p className="numAnnotated">Annotated samples: {this.state.numAnnotated}</p>
         </div>
       </div>
     );
