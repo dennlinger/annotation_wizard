@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
-const password = require('./secrets.json');
+let config = require('./secrets.json');
 
 let inputFilePath = path.join(__dirname, 'input', 'test1.tsv');
 let outputFilePath = path.join(__dirname, 'output', 'test1.tsv');
@@ -65,7 +65,16 @@ for (i = 1; i < data.length; i++) {
   // console.log(processed[processed.length -1][4]);
 }
 
-let counter = 0;
+let counter = config.counter;
+
+function writeJSON(currentCount) {
+  config.counter = currentCount;
+  let newConfig = JSON.stringify(config);
+  fs.writeFile('secrets.json', newConfig, (err) => {
+    if (err) throw err;
+    console.log('The file has been saved!');
+  });
+}
 
 function next(req, res) {
   console.log("Received request with current index " + counter)
@@ -83,6 +92,7 @@ function receive(req, res) {
   // out until we get an annotation for it.
   console.log("Data returned for index " + counter);
   counter++;
+  writeJSON(counter);
 
   // re-format the response into the input layout
   let annotated_sentence = merge(sentence[counter -1], req.body.annotations).join(' ');
@@ -96,13 +106,14 @@ function receive(req, res) {
 function skip(req, res) {
   // Just increase the counter, in case a sentence should be skipped.
   counter ++;
+  writeJSON(counter);
   console.log('Sentence ' + counter + ' was skipped.');
   res.status(200).send('Successfully skipped!\n');
 }
 
 function download(req, res) {
   console.log('Data download requested.');
-  if (req.body.password != password.password) {
+  if (req.body.password != config.password) {
     console.log('Wrong password provided!');
     res.status(404).send('Failed to download data!\n');
   } else {
