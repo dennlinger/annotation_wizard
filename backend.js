@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const app = express();
+const password = require('./secrets.json');
 
 let inputFilePath = path.join(__dirname, 'input', 'test1.tsv');
 let outputFilePath = path.join(__dirname, 'output', 'test1.tsv');
@@ -48,7 +49,16 @@ for (i = 1; i < data.length; i++) {
   processed.push(data[i].trim().split("\t"));
   group.push(processed[processed.length - 1][3]);
 
-  sentence.push(processed[processed.length -1][4].split(" ").map(x => x.split("@")[0]));
+  let cleanSentence = '';
+  if (processed[processed.length -1][4].startsWith('@0 ')) {
+    cleanSentence = processed[processed.length -1][4].substr(3);
+  } else if (processed[processed.length -1][4].startsWith('@0')) {
+    cleanSentence = processed[processed.length -1][4].substr(2);
+  } else {
+    cleanSentence = processed[processed.length -1][4];
+  }
+  
+  sentence.push(cleanSentence.split(" ").map(x => x.split("@")[0]));
   // debug
   // console.log(i);
   // console.log(group[group.length -1]);
@@ -71,7 +81,7 @@ function next(req, res) {
 function receive(req, res) {
   // Increase counter only if we receive values. That way we send the sample
   // out until we get an annotation for it.
-  console.log("Data returned for index " + counter)
+  console.log("Data returned for index " + counter);
   counter++;
 
   // re-format the response into the input layout
@@ -79,14 +89,37 @@ function receive(req, res) {
   let processed_line = processed[counter -1];
   processed_line[4] = annotated_sentence;
   stream.write(processed_line.join('\t') + '\n');
-  res.status(200).send('Post successful!');
+  res.status(200).send('Post successful!\n');
 
+}
+
+function skip(req, res) {
+  // Just increase the counter, in case a sentence should be skipped.
+  counter ++;
+  console.log('Sentence ' + counter + ' was skipped.');
+  res.status(200).send('Successfully skipped!\n');
+}
+
+function download(req, res) {
+  console.log('Data download requested.');
+  if (req.body.password != password.password) {
+    console.log('Wrong password provided!');
+    res.status(404).send('Failed to download data!\n');
+  } else {
+    console.log('Correct password sent.');
+    
+    res.status(200).send('Success!\n');
+  }
 }
 
 app.get('/next', (req, res) => {next(req, res)});
 
 app.use(express.json());
-app.post('/receive', (req, res) => {receive(req, res)})
+app.post('/receive', (req, res) => {receive(req, res)});
+
+app.post('/skip', (req, res) => {skip(req, res)});
+
+app.post('/download', (req, res) => {download(req, res)});
 
 // Listen
 app.listen(3001, () => console.log('Server ready'));

@@ -86,11 +86,47 @@ class App extends Component {
     console.log(annotations.slice(0,20));
   }
 
-
+  // Successfully annotated sentence will be sent back to the server
+  // and then immediately a new sentence is requested.
   sendResponseAndUpdate() {
     // send back the current sample
     console.log("Send results");
     fetch('/receive', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        annotations: this.state.annotations,
+      })
+    });
+    this.setState({isLoaded: false});
+    // And then print new stuff after short delay.
+    // Delay is necessary from server-side async problems.
+    setTimeout(() => {
+
+    console.log("Send request for new data");
+    this.callBackendAPI()
+      .then(res => {
+        console.log("New data received.")
+        this.setState({group: res.group,
+                       sentence: res.sentence,
+                       annotations: Array(res.sentence.length).fill(0),
+                       isLoaded: true,
+                     });
+        console.log("Finished setting state.")
+      })
+      .catch(err => console.log(err));
+    }, 500)
+  }
+
+  // Sometimes we just want to skip a sentence. Still needs to send a post request,
+  // since it otherwise won't increase the counter.
+  sendSkipAndUpdate() {
+    // send back the current sample
+    console.log("Send results");
+    fetch('/skip', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -119,7 +155,6 @@ class App extends Component {
     }, 500)
   }
 
-
   render() {
     return (
       <div className="App">
@@ -132,6 +167,7 @@ class App extends Component {
             }
           </div>
           <button className="next" onClick={() => this.sendResponseAndUpdate()}>Next sentence</button>
+          <button className="skip" onClick={() => this.sendSkipAndUpdate()}>Skip</button>
         </div>
       </div>
     );
