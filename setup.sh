@@ -6,7 +6,7 @@
 # (3) data file location
 # (4) password
 
-$frontendPort=expr $2 - 1
+frontendPort=`expr $2 - 1`
 # set up files
 mkdir $1/output/
 cp $3 $1/input/test1.tsv
