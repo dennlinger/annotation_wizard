@@ -133,7 +133,7 @@ function download(req, res) {
   } else {
     console.log('Correct password sent.');
     
-    res.status(200).send('Success!\n');
+    res.download('./output/test1.tsv', 'annotated_data.tsv');
   }
 }
 
