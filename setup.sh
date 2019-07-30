@@ -21,4 +21,4 @@ mkdir -p $1/wizard/node_modules
 npm install --prefix $1/wizard
 
 nohup node backend.js &
-nohup npm start --prefix $1/wizard
+nohup npm start --prefix $1/wizard &
