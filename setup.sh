@@ -10,7 +10,7 @@ $frontendPort=expr $2 - 1
 # set up files
 mkdir $1/output/
 cp $3 $1/input/test1.tsv
-cat '{"password":"'$4'","counter":0,"annotated":0}' > $1/secrets.json
+echo '{"password":"'$4'","counter":0,"annotated":0}' > $1/secrets.json
 
 # replace port numbers
 sed -i 's/3001/'$2'/g' $1/backend.js
